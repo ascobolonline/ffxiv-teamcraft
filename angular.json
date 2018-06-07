@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "client": {
+    "ffxiv-teamcraft": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -58,7 +58,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "with": "src/environments/environment.electron-prod.ts"
                 }
               ]
             },
@@ -84,21 +84,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "client:build"
+            "browserTarget": "ffxiv-teamcraft:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "client:build:production"
+              "browserTarget": "ffxiv-teamcraft:build:production"
             },
             "beta": {
-              "browserTarget": "client:build:beta"
+              "browserTarget": "ffxiv-teamcraft:build:beta"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "client:build"
+            "browserTarget": "ffxiv-teamcraft:build"
           }
         },
         "test": {
@@ -129,6 +129,14 @@
             ],
             "exclude": []
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/ffxiv-teamcraft-server",
+            "main": "src/main.server.ts",
+            "tsConfig": "src/tsconfig.server.json"
+          }
         }
       }
     },
@@ -138,7 +146,7 @@
       "projectType": "application"
     }
   },
-  "defaultProject": "client",
+  "defaultProject": "ffxiv-teamcraft",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

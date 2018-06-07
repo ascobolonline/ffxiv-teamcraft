@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, ViewChild} from '@angular/core';
 import {AngularFireAuth} from 'angularfire2/auth';
 import {TranslateService} from '@ngx-translate/core';
 import {NavigationEnd, Router} from '@angular/router';
@@ -29,6 +29,7 @@ import {debounceTime, distinctUntilChanged, filter, first, map} from 'rxjs/opera
 import {PlatformService} from './core/tools/platform.service';
 import {IpcService} from './core/electron/ipc.service';
 import {GarlandToolsService} from './core/api/garland-tools.service';
+import {isPlatformBrowser} from '@angular/common';
 
 declare const ga: Function;
 
@@ -99,7 +100,8 @@ export class AppComponent implements OnInit {
                 private pendingChangesService: PendingChangesService,
                 public platformService: PlatformService,
                 private ipc: IpcService,
-                private gt: GarlandToolsService) {
+                private gt: GarlandToolsService,
+                @Inject(PLATFORM_ID) private platformId: Object) {
 
         this.gt.preload();
 
@@ -143,11 +145,16 @@ export class AppComponent implements OnInit {
 
         // Translation
         translate.setDefaultLang('en');
-        const lang = localStorage.getItem('locale');
+        let lang = null;
+        if (isPlatformBrowser(this.platformId)) {
+            lang = localStorage.getItem('locale');
+        }
         if (lang !== null) {
             this.use(lang);
-        } else {
+        } else if (isPlatformBrowser(this.platformId)) {
             this.use(translate.getBrowserLang());
+        } else {
+            this.use('en');
         }
         translate.onLangChange.subscribe(change => {
             this.locale = change.lang;
@@ -160,18 +167,20 @@ export class AppComponent implements OnInit {
                 filter(() => !this.overlay)
             )
             .subscribe((announcement: Announcement) => {
-                let lastLS = localStorage.getItem('announcement:last');
-                if (lastLS !== null && !lastLS.startsWith('{')) {
-                    lastLS = '{}';
-                }
-                const last = JSON.parse(lastLS || '{}');
-                if (last.text !== announcement.text) {
-                    this.dialog.open(AnnouncementPopupComponent, {data: announcement})
-                        .afterClosed()
-                        .pipe(first())
-                        .subscribe(() => {
-                            localStorage.setItem('announcement:last', JSON.stringify(announcement));
-                        });
+                if (isPlatformBrowser(this.platformId)) {
+                    let lastLS = localStorage.getItem('announcement:last');
+                    if (lastLS !== null && !lastLS.startsWith('{')) {
+                        lastLS = '{}';
+                    }
+                    const last = JSON.parse(lastLS || '{}');
+                    if (last.text !== announcement.text) {
+                        this.dialog.open(AnnouncementPopupComponent, {data: announcement})
+                            .afterClosed()
+                            .pipe(first())
+                            .subscribe(() => {
+                                localStorage.setItem('announcement:last', JSON.stringify(announcement));
+                            });
+                    }
                 }
             });
     }
@@ -204,26 +213,33 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (localStorage.getItem('push:authorization:asked') === null) {
-            this.push.requestPermission();
-            localStorage.setItem('push:authorization:asked', 'true');
+        if (isPlatformBrowser(this.platformId)) {
+            if (localStorage.getItem('push:authorization:asked') === null) {
+                this.push.requestPermission();
+                localStorage.setItem('push:authorization:asked', 'true');
+            }
         }
         // Do this later to avoid change detection conflict
         setTimeout(() => {
             this.firebase.object('/giveway').valueChanges().subscribe((givewayActivated: boolean) => {
-                if (localStorage.getItem('giveway') === null && givewayActivated) {
-                    this.showGiveway();
+                if (isPlatformBrowser(this.platformId)) {
+                    if (localStorage.getItem('giveway') === null && givewayActivated) {
+                        this.showGiveway();
+                    }
                 }
                 this.givewayRunning = givewayActivated;
             });
 
-            // Check if it's beta/dev mode and the disclaimer has not been displayed yet.
-            if (!environment.production && localStorage.getItem('beta-disclaimer') === null) {
-                // Open beta disclaimer popup.
-                this.dialog.open(BetaDisclaimerPopupComponent).afterClosed().subscribe(() => {
-                    // Once it's closed, set the storage value to say it has been displayed.
-                    localStorage.setItem('beta-disclaimer', 'true');
-                });
+
+            if (isPlatformBrowser(this.platformId)) {
+                // Check if it's beta/dev mode and the disclaimer has not been displayed yet.
+                if (!environment.production && localStorage.getItem('beta-disclaimer') === null) {
+                    // Open beta disclaimer popup.
+                    this.dialog.open(BetaDisclaimerPopupComponent).afterClosed().subscribe(() => {
+                        // Once it's closed, set the storage value to say it has been displayed.
+                        localStorage.setItem('beta-disclaimer', 'true');
+                    });
+                }
             }
 
             // Patreon popup.
@@ -317,7 +333,9 @@ export class AppComponent implements OnInit {
             lang = 'en';
         }
         this.locale = lang;
-        localStorage.setItem('locale', lang);
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('locale', lang);
+        }
         this.translate.use(lang);
     }
 

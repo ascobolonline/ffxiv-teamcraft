@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
+import {Component, Inject, Input, PLATFORM_ID} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
+import {isPlatformBrowser} from '@angular/common';
 
 @Component({
     selector: 'app-eorzean-time',
@@ -11,11 +12,14 @@ export class EorzeanTimeComponent {
     @Input()
     date: Date;
 
-    constructor(private translator: TranslateService) {
+    constructor(private translator: TranslateService, @Inject(PLATFORM_ID) private platformId: Object) {
     }
 
     getDateString(): string {
-        const format = localStorage.getItem('etime:format') || this.getDefaultFormat();
+        let format = this.getDefaultFormat();
+        if (isPlatformBrowser(this.platformId)) {
+            format = localStorage.getItem('etime:format') || this.getDefaultFormat();
+        }
         const minutes = this.date.getUTCMinutes();
         let hours = this.date.getUTCHours();
         let suffix = '';

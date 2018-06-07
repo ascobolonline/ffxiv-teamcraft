@@ -1,15 +1,18 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
 import {Subject} from 'rxjs';
+import {isPlatformBrowser} from '@angular/common';
 
 @Injectable()
 export class SettingsService {
 
-    private cache: { [id: string]: string };
+    private cache: { [id: string]: string } = {};
 
     public themeChange$ = new Subject<{ previous: string, next: string }>();
 
-    constructor() {
-        this.cache = JSON.parse(localStorage.getItem('settings')) || {};
+    constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+        if (isPlatformBrowser(this.platformId)) {
+            this.cache = JSON.parse(localStorage.getItem('settings')) || {};
+        }
     }
 
     public get baseLink(): string {
@@ -116,7 +119,9 @@ export class SettingsService {
 
     private setSetting(name: string, value: string): void {
         this.cache[name] = value;
-        localStorage.setItem('settings', JSON.stringify(this.cache));
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('settings', JSON.stringify(this.cache));
+        }
     }
 
 }

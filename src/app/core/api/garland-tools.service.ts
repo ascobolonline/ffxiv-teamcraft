@@ -1,8 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
 import {GarlandToolsData} from '../../model/list/garland-tools-data';
 import {Item} from '../../model/garland-tools/item';
 import {NgSerializerService} from '@kaiu/ng-serializer';
 import {HttpClient} from '@angular/common/http';
+import {isPlatformBrowser} from '@angular/common';
 
 @Injectable()
 export class GarlandToolsService {
@@ -10,11 +11,11 @@ export class GarlandToolsService {
     private gt: GarlandToolsData = (<any>window).gt;
     private gItemIndex: any[] = (<any>window).gItemIndex;
 
-    constructor(private serializer: NgSerializerService, private http: HttpClient) {
+    constructor(private serializer: NgSerializerService, private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
     }
 
     public preload(): void {
-        if (this.gt.jobCategories === undefined) {
+        if (isPlatformBrowser(this.platformId) && this.gt.jobCategories === undefined) {
             this.http.get<GarlandToolsData>('https://www.garlandtools.org/db/doc/core/en/2/data.json')
                 .subscribe(data => this.gt = Object.assign(this.gt, data));
         }

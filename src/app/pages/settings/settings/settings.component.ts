@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, Inject, PLATFORM_ID} from '@angular/core';
 import {SettingsService} from '../settings.service';
 import {TranslateService} from '@ngx-translate/core';
 import {AppComponent} from '../../../app.component';
+import {isPlatformBrowser} from '@angular/common';
 
 @Component({
     selector: 'app-settings',
@@ -27,7 +28,8 @@ export class SettingsComponent {
     public locales: string[] = AppComponent.LOCALES;
 
     constructor(public settings: SettingsService,
-                private translate: TranslateService) {
+                private translate: TranslateService,
+                @Inject(PLATFORM_ID) private platformId: Object) {
         this.locale = this.translate.currentLang;
         translate.onLangChange.subscribe(change => {
             this.locale = change.lang;
@@ -39,7 +41,9 @@ export class SettingsComponent {
             lang = 'en';
         }
         this.locale = lang;
-        localStorage.setItem('locale', lang);
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('locale', lang);
+        }
         this.translate.use(lang);
     }
 }

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Inject, PLATFORM_ID} from '@angular/core';
 import {LayoutService} from '../../../core/layout/layout.service';
 import {MatDialog, MatDialogRef, MatSnackBar} from '@angular/material';
 import {LayoutRow} from '../../../core/layout/layout-row';
@@ -9,6 +9,7 @@ import {NgSerializerService} from '@kaiu/ng-serializer';
 import {ListLayout} from '../../../core/layout/list-layout';
 import {ConfirmationPopupComponent} from '../../../modules/common-components/confirmation-popup/confirmation-popup.component';
 import {filter} from 'rxjs/operators';
+import {isPlatformBrowser} from '@angular/common';
 
 @Component({
     selector: 'app-list-layout-popup',
@@ -23,14 +24,16 @@ export class ListLayoutPopupComponent {
 
     constructor(public layoutService: LayoutService, private dialogRef: MatDialogRef<ListLayoutPopupComponent>,
                 private dialog: MatDialog, private snackBar: MatSnackBar, private translator: TranslateService,
-                private serializer: NgSerializerService) {
+                private serializer: NgSerializerService, @Inject(PLATFORM_ID) private platformId: Object) {
         this.layoutService.layouts.subscribe(layouts => {
             this.availableLayouts = layouts;
             if (this.availableLayouts[this.selectedIndex] === undefined) {
                 this.selectedIndex = 0;
             }
         });
-        this.selectedIndex = +(localStorage.getItem('layout:selected') || 0);
+        if (isPlatformBrowser(this.platformId)) {
+            this.selectedIndex = +(localStorage.getItem('layout:selected') || 0);
+        }
     }
 
     public newLayout(): void {

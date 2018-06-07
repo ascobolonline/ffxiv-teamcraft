@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
+import {environment} from '../../../environments/environment';
 
-export const IS_ELECTRON = navigator.userAgent.toLowerCase().indexOf('electron/') > -1;
+export const IS_ELECTRON = environment.electron;
 
 @Injectable()
 export class PlatformService {

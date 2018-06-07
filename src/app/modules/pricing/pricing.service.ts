@@ -1,7 +1,8 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
 import {ListRow} from '../../model/list/list-row';
 import {Price} from './model/price';
 import {ItemAmount} from './model/item-amount';
+import {isPlatformBrowser} from '@angular/common';
 
 @Injectable()
 export class PricingService {
@@ -9,16 +10,18 @@ export class PricingService {
     /**
      * Object representation of current stored prices
      */
-    private prices: { [index: number]: Price };
+    private prices: { [index: number]: Price } = {};
 
     /**
      * Object representation of current stored amounts
      */
-    private amounts: { [index: string]: { [index: number]: ItemAmount } };
+    private amounts: { [index: string]: { [index: number]: ItemAmount } } = {};
 
-    constructor() {
-        this.prices = this.parsePrices(localStorage.getItem('prices'));
-        this.amounts = JSON.parse(localStorage.getItem('amounts')) || {};
+    constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+        if (isPlatformBrowser(this.platformId)) {
+            this.prices = this.parsePrices(localStorage.getItem('prices'));
+            this.amounts = JSON.parse(localStorage.getItem('amounts')) || {};
+        }
     }
 
     /**

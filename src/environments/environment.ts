@@ -8,6 +8,7 @@ import {version} from './version';
 export const environment = {
     production: false,
     version: version,
+    electron: false,
     firebase: {
         apiKey: 'AIzaSyCkrNPf7XlyuxQeqNtynvDFDnQ-XigG3WA',
         authDomain: 'ffxiv-teamcraft-beta.firebaseapp.com',

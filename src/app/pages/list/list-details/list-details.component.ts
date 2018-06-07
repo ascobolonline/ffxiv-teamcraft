@@ -3,11 +3,13 @@ import {
     ChangeDetectorRef,
     Component,
     EventEmitter,
+    Inject,
     Input,
     OnChanges,
     OnDestroy,
     OnInit,
     Output,
+    PLATFORM_ID,
     SimpleChanges
 } from '@angular/core';
 import {AngularFireAuth} from 'angularfire2/auth';
@@ -40,6 +42,7 @@ import {PlatformService} from '../../../core/tools/platform.service';
 import {LinkToolsService} from '../../../core/tools/link-tools.service';
 import {I18nToolsService} from '../../../core/tools/i18n-tools.service';
 import {LocalizedDataService} from '../../../core/data/localized-data.service';
+import {isPlatformBrowser} from '@angular/common';
 
 declare const ga: Function;
 
@@ -99,7 +102,10 @@ export class ListDetailsComponent extends ComponentWithSubscriptions implements 
     private upgradingList = false;
 
     public get selectedIndex(): number {
-        return +(localStorage.getItem('layout:selected') || 0);
+        if (isPlatformBrowser(this.platformId)) {
+            return +(localStorage.getItem('layout:selected') || 0);
+        }
+        return 0;
     }
 
     constructor(private auth: AngularFireAuth, private userService: UserService, protected dialog: MatDialog,
@@ -107,7 +113,7 @@ export class ListDetailsComponent extends ComponentWithSubscriptions implements 
                 private translate: TranslateService, private router: Router, private eorzeanTimeService: EorzeanTimeService,
                 public settings: SettingsService, private layoutService: LayoutService, private cd: ChangeDetectorRef,
                 public platform: PlatformService, private linkTools: LinkToolsService, private l12n: LocalizedDataService,
-                private i18nTools: I18nToolsService) {
+                private i18nTools: I18nToolsService, @Inject(PLATFORM_ID) private platformId: Object) {
         super();
         this.initFilters();
         this.listDisplay = this.listData$
@@ -287,7 +293,7 @@ export class ListDetailsComponent extends ComponentWithSubscriptions implements 
                     return rowExportString + `${row.amount}x ${this.i18nTools.getName(this.l12n.getItem(row.id))}\n`
                 }, `${this.translate.instant(displayRow.title)}:\n`) + '\n';
             }, `${this.linkTools.getLink(`list/${this.listData.$key}`)
-            }\n\n${this.listData.name}: \n\n${
+                }\n\n${this.listData.name}: \n\n${
                 this.getCrystalsTextExport(this.translate.instant('Crystals'), this.listData.crystals)}`);
     }
 

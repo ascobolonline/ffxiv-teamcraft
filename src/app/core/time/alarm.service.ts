@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
 import {EorzeanTimeService} from './eorzean-time.service';
 import {Alarm} from './alarm';
 import {Observable, of, Subscription} from 'rxjs';
@@ -18,6 +18,7 @@ import {PlatformService} from '../tools/platform.service';
 import {IpcService} from '../electron/ipc.service';
 import {MapService} from '../../modules/map/map.service';
 import {I18nToolsService} from '../tools/i18n-tools.service';
+import {isPlatformServer} from '@angular/common';
 
 @Injectable()
 export class AlarmService {
@@ -28,7 +29,7 @@ export class AlarmService {
                 private localizedData: LocalizedDataService, private translator: TranslateService, private dialog: MatDialog,
                 private bellNodesService: BellNodesService, private pushNotificationsService: PushNotificationsService,
                 private userService: UserService, private platform: PlatformService, private ipc: IpcService,
-                private mapService: MapService, private i18nTools: I18nToolsService) {
+                private mapService: MapService, private i18nTools: I18nToolsService, @Inject(PLATFORM_ID) private platformId: Object) {
         this.userService.getUserData().pipe(map((user: AppUser) => user.alarms || []))
             .subscribe(alarms => this.loadAlarms(...alarms));
     }
@@ -179,6 +180,9 @@ export class AlarmService {
      * @param {Alarm} alarm
      */
     private playAlarm(alarm: Alarm): void {
+        if (isPlatformServer(this.platformId)) {
+            return;
+        }
         if (this.settings.alarmsMuted) {
             return;
         }

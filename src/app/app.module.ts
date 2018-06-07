@@ -6,9 +6,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
     MatButtonModule,
     MatCardModule,
-    MatExpansionModule, MatFormFieldModule,
+    MatExpansionModule,
+    MatFormFieldModule,
     MatGridListModule,
-    MatIconModule, MatInputModule,
+    MatIconModule,
+    MatInputModule,
     MatListModule,
     MatMenuModule,
     MatSidenavModule,
@@ -113,7 +115,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         MatFormFieldModule,
         MatInputModule,
 
-        BrowserModule,
+        BrowserModule.withServerTransition({appId: 'serverApp'}),
         FormsModule,
         ReactiveFormsModule,
 

@@ -54,7 +54,11 @@
     "electron:setup:publish": "del-cli release/* && npm run build:electron-prod && electron-builder -p always",
     "postinstall": "electron-builder install-app-deps",
     "release:full": "npm run build:prod && firebase deploy -P default --only hosting && npm run electron:setup:publish",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder --dir",
+    "********** SSR STUFF **************": "",
+    "build:ssr": "npm run build:prod && ng run ffxiv-teamcraft:server && npm run webpack:ssr",
+    "serve:ssr": "node dist/ffxiv-teamcraft/server.js",
+    "webpack:ssr": "webpack --config webpack.server.config.js"
   },
   "private": true,
   "dependencies": {
@@ -97,7 +101,8 @@
     "rxjs": "^6.1.0",
     "semver": "^5.4.1",
     "web-animations-js": "^2.3.1",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "@angular/platform-server": "6.0.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.1",
@@ -131,10 +136,14 @@
     "protractor": "~5.3.2",
     "rxjs-compat": "^6.1.0",
     "standard-version": "^4.2.0",
+    "ts-loader": "^4.3.1",
     "ts-node": "~6.0.3",
     "tslint": "^5.10.0",
     "typescript": ">=2.7.2 <2.8.0",
-    "validate-commit-msg": "^2.14.0"
+    "validate-commit-msg": "^2.14.0",
+    "webpack-cli": "^3.0.3",
+    "ws": "^5.2.0",
+    "xmlhttprequest": "^1.8.0"
   },
   "config": {
     "commitizen": {
