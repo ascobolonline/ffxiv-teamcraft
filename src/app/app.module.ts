@@ -63,6 +63,7 @@ import {WikiModule} from './pages/wiki/wiki.module';
 import {SimulatorModule} from './pages/simulator/simulator.module';
 import {NgDragDropModule} from 'ng-drag-drop';
 import {IS_ELECTRON} from './core/tools/platform.service';
+import {FlexLayoutServerModule} from '@angular/flex-layout/server';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -99,6 +100,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         HttpClientModule,
         // Animations for material.
         BrowserAnimationsModule,
+
+        FlexLayoutServerModule,
 
         MatToolbarModule,
         MatButtonModule,

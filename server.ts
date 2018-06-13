@@ -34,9 +34,28 @@ const {AppServerModuleNgFactory} = require(`./dist/${APP_NAME}-server/main`);
 const template = readFileSync(join(DIST_FOLDER, 'index.html')).toString();
 
 const win = domino.createWindow(template);
+Object.defineProperty(win.document.body.style, 'transform', {
+    value: () => {
+        return {
+            enumerable: true,
+            configurable: true
+        };
+    },
+});
+
+Object.defineProperty(win.document.body.style, 'box-shadow', {
+    value: () => {
+        return {
+            enumerable: true,
+            configurable: true
+        };
+    },
+});
 global['window'] = win;
 global['document'] = win.document;
 global['navigator'] = win.navigator;
+global['ga'] = function () {
+};
 
 app.engine('html', (_, options, callback) => {
     renderModuleFactory(AppServerModuleNgFactory, {

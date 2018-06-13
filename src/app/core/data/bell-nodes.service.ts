@@ -1,8 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
 import {LocalizedDataService} from './localized-data.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Language} from './language';
 import {reductions} from './sources/reductions';
+import {isPlatformBrowser} from '@angular/common';
 
 @Injectable()
 export class BellNodesService {
@@ -10,11 +11,15 @@ export class BellNodesService {
     /**
      * Reference to global garlandtools data.
      */
-    private nodes: any[] = (<any>window).gt.bell.nodes;
+    private nodes: any[] = [];
 
     private cache: { [index: number]: any[] } = {};
 
-    constructor(private localizedDataService: LocalizedDataService, private i18n: TranslateService) {
+    constructor(private localizedDataService: LocalizedDataService, private i18n: TranslateService,
+                @Inject(PLATFORM_ID) private platformId: Object) {
+        if (isPlatformBrowser(platformId)) {
+            this.nodes = (<any>window).gt.bell.nodes;
+        }
     }
 
     getNodesByItemName(name: string): any[] {
