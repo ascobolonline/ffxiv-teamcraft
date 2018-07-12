@@ -53,6 +53,7 @@ import {NgDragDropModule} from 'ng-drag-drop';
 import {IS_ELECTRON} from './core/tools/platform.service';
 import {CommissionBoardModule} from './pages/commission-board/commission-board.module';
 import {AppRoutingModule} from './app-routing.module';
+import {ServiceWorkerModule} from '@angular/service-worker';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -134,6 +135,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         TemplateModule,
         SimulatorModule,
         CommissionBoardModule,
+        ServiceWorkerModule.register('/ngsw-worker.js', {enabled: environment.production}),
     ],
     bootstrap: [AppComponent]
 })
